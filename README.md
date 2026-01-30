@@ -11,7 +11,7 @@ Ansible の JSON 出力をパースし、GitHub PR コメント向けの Markdow
 - Diff の詳細 (prepared / before-after 形式に対応)
 - 失敗したタスクとエラーメッセージ
 
-終了コードは Ansible の慣例に合わせ、変更なしで `0`、変更ありで `2`、エラーで `1` を返します。
+終了コードは Ansible の慣例に合わせ、変更・失敗なしで `0`、変更または失敗ありで `2`、ツールエラーで `1` を返します。
 
 ## インストール
 
@@ -42,9 +42,9 @@ Options:
   -h, --help          ヘルプ表示
 
 Exit codes:
-  0 - No changes
-  2 - Changes detected
-  1 - Error
+  0 - No changes or failures
+  2 - Changes or failures detected
+  1 - Tool error (invalid input, file not found, etc.)
 ```
 
 ### 例
