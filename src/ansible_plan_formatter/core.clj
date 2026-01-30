@@ -19,8 +19,9 @@
    "\n"
    ["Usage: ansible-plan-formatter [OPTIONS]"
     "" "Options:" summary ""
-    "Exit codes:" "  0 - No changes"
-    "  2 - Changes detected" "  1 - Error"]))
+    "Exit codes:" "  0 - No changes or failures"
+    "  2 - Changes or failures detected"
+    "  1 - Tool error"]))
 
 (defn- read-input
   "Read input from file or stdin."
