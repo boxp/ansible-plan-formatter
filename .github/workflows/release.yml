@@ -1,0 +1,49 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: '21'
+          distribution: 'graalvm'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: DeLaGuardo/setup-clojure@v14
+        with:
+          cli: latest
+
+      - name: Run tests
+        run: clojure -M:test
+
+      - name: Build uberjar
+        run: clojure -T:build uber
+
+      - name: Build native image
+        run: |
+          native-image \
+            -jar target/ansible-plan-formatter-0.1.0-standalone.jar \
+            -o ansible-plan-formatter \
+            -H:+ReportExceptionStackTraces \
+            -H:ReflectionConfigurationFiles=reflect-config.json \
+            --no-fallback \
+            --initialize-at-build-time \
+            -J-Dclojure.compiler.direct-linking=true
+
+      - name: Package binary
+        run: |
+          tar czf ansible-plan-formatter_linux_amd64.tar.gz ansible-plan-formatter
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ansible-plan-formatter_linux_amd64.tar.gz
+          generate_release_notes: true

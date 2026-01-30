@@ -1,0 +1,75 @@
+{
+  "plays": [
+    {
+      "play": {
+        "name": "control-plane",
+        "id": "play-1"
+      },
+      "tasks": [
+        {
+          "task": {
+            "name": "Gather facts",
+            "action": "setup"
+          },
+          "hosts": {
+            "shanghai-1": {
+              "changed": false,
+              "ok": true
+            }
+          }
+        },
+        {
+          "task": {
+            "name": "Install nginx",
+            "action": "apt"
+          },
+          "hosts": {
+            "shanghai-1": {
+              "changed": true,
+              "diff": {
+                "prepared": "- nginx (not installed)\n+ nginx 1.24.0-2"
+              }
+            }
+          }
+        },
+        {
+          "task": {
+            "name": "Deploy nginx config",
+            "action": "template"
+          },
+          "hosts": {
+            "shanghai-1": {
+              "changed": true,
+              "diff": {
+                "before": "old config content\n",
+                "after": "new config content\n",
+                "before_header": "/etc/nginx/nginx.conf",
+                "after_header": "/etc/nginx/nginx.conf"
+              }
+            }
+          }
+        },
+        {
+          "task": {
+            "name": "Restart nginx",
+            "action": "systemd"
+          },
+          "hosts": {
+            "shanghai-1": {
+              "changed": true
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "stats": {
+    "shanghai-1": {
+      "ok": 45,
+      "changed": 3,
+      "skipped": 12,
+      "failures": 0,
+      "unreachable": 0
+    }
+  }
+}

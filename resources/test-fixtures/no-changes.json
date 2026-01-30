@@ -1,0 +1,45 @@
+{
+  "plays": [
+    {
+      "play": {
+        "name": "control-plane",
+        "id": "play-1"
+      },
+      "tasks": [
+        {
+          "task": {
+            "name": "Gather facts",
+            "action": "setup"
+          },
+          "hosts": {
+            "shanghai-1": {
+              "changed": false,
+              "ok": true
+            }
+          }
+        },
+        {
+          "task": {
+            "name": "Check packages",
+            "action": "apt"
+          },
+          "hosts": {
+            "shanghai-1": {
+              "changed": false,
+              "ok": true
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "stats": {
+    "shanghai-1": {
+      "ok": 45,
+      "changed": 0,
+      "skipped": 12,
+      "failures": 0,
+      "unreachable": 0
+    }
+  }
+}

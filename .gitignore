@@ -1,0 +1,6 @@
+target/
+.cpcache/
+.nrepl-port
+*.jar
+ansible-plan-formatter
+.clj-kondo/.cache/

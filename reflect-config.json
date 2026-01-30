@@ -1,0 +1,23 @@
+[
+  {
+    "name": "java.lang.reflect.Method",
+    "allDeclaredFields": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "clojure.lang.RT",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "clojure.lang.Compiler",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicMethods": true,
+    "allDeclaredFields": true
+  }
+]

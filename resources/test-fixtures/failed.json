@@ -1,0 +1,46 @@
+{
+  "plays": [
+    {
+      "play": {
+        "name": "control-plane",
+        "id": "play-1"
+      },
+      "tasks": [
+        {
+          "task": {
+            "name": "Gather facts",
+            "action": "setup"
+          },
+          "hosts": {
+            "shanghai-1": {
+              "changed": false,
+              "ok": true
+            }
+          }
+        },
+        {
+          "task": {
+            "name": "Install broken package",
+            "action": "apt"
+          },
+          "hosts": {
+            "shanghai-1": {
+              "failed": true,
+              "changed": false,
+              "msg": "No package matching 'broken-pkg' found"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "stats": {
+    "shanghai-1": {
+      "ok": 1,
+      "changed": 0,
+      "skipped": 0,
+      "failures": 1,
+      "unreachable": 0
+    }
+  }
+}
