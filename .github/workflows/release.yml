@@ -17,7 +17,7 @@ jobs:
           distribution: 'graalvm'
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: DeLaGuardo/setup-clojure@v14
+      - uses: DeLaGuardo/setup-clojure@13
         with:
           cli: latest
 
