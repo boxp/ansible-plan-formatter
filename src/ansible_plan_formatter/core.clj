@@ -23,6 +23,12 @@
     "  2 - Changes or failures detected"
     "  1 - Tool error"]))
 
+(defn- log-stderr
+  "Log a message to stderr."
+  [& args]
+  (binding [*out* *err*]
+    (println (str/join " " args))))
+
 (defn- read-input
   "Read input from file or stdin."
   [input-file]
@@ -55,13 +61,25 @@
     (println output)
     (if (fmt/has-changes? changed failed) 2 0)))
 
-(defn- run
-  "Main logic: parse input and format output."
+(defn- run-format
+  "Parse input, format, and return exit code."
   [options]
   (let [{:keys [parsed hostname playbook-name]}
         (parse-input options)]
     (format-and-print
      parsed hostname playbook-name)))
+
+(defn- run
+  "Main logic with error handling and logging."
+  [options]
+  (try
+    (let [code (run-format options)]
+      (log-stderr
+       "ansible-plan-formatter:" "exit" code)
+      code)
+    (catch Exception e
+      (log-stderr "Error:" (.getMessage e))
+      1)))
 
 (defn- handle-help
   "Show help and exit."
@@ -75,16 +93,6 @@
   (doseq [e errors] (println e))
   (System/exit 1))
 
-(defn- run-with-exit
-  "Run and exit with appropriate code."
-  [options]
-  (try
-    (System/exit (run options))
-    (catch Exception e
-      (binding [*out* *err*]
-        (println "Error:" (.getMessage e)))
-      (System/exit 1))))
-
 (defn -main
   "CLI entry point."
   [& args]
@@ -93,4 +101,4 @@
     (cond
       (:help options) (handle-help summary)
       errors (handle-errors errors)
-      :else (run-with-exit options))))
+      :else (System/exit (run options)))))
