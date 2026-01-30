@@ -1,15 +1,23 @@
 (ns ansible-plan-formatter.core
     "Entry point for ansible-plan-formatter CLI."
     (:require [ansible-plan-formatter.formatter :as fmt]
+              [ansible-plan-formatter.json-formatter
+               :as json-fmt]
               [ansible-plan-formatter.parser :as parser]
               [clojure.string :as str]
               [clojure.tools.cli :as cli])
     (:gen-class))
 
+(def ^:private valid-formats #{"json" "markdown"})
+
 (def ^:private cli-options
      [["-i" "--input FILE" "Input file (default: stdin)"]
       ["-n" "--node NAME" "Node name label"]
       ["-p" "--playbook NAME" "Playbook name label"]
+      ["-f" "--format FORMAT" "Output format (json|markdown)"
+       :default "json"
+       :validate [#(contains? valid-formats %)
+                  "Must be json or markdown"]]
       ["-h" "--help" "Show help"]])
 
 (defn- usage
@@ -47,19 +55,44 @@
      :hostname hostname
      :playbook-name (or playbook "playbook")}))
 
+(defn- extract-all
+  "Extract stats, changed and failed tasks."
+  [parsed hostname]
+  {:stats (parser/extract-stats parsed)
+   :changed (parser/extract-changed-tasks
+             parsed hostname)
+   :failed (parser/extract-failed-tasks
+            parsed hostname)})
+
+(defn- format-as-json
+  "Format output as JSON and return exit code."
+  [parsed hostname playbook-name]
+  (let [{:keys [stats changed failed]}
+        (extract-all parsed hostname)
+        has-chg (fmt/has-changes? changed failed)]
+    (println (json-fmt/format-json
+              hostname playbook-name
+              stats changed failed has-chg))
+    (if has-chg 2 0)))
+
+(defn- format-as-markdown
+  "Format output as Markdown and return exit code."
+  [parsed hostname playbook-name]
+  (let [{:keys [stats changed failed]}
+        (extract-all parsed hostname)]
+    (println (fmt/format-output
+              hostname playbook-name
+              stats changed failed))
+    (if (fmt/has-changes? changed failed) 2 0)))
+
 (defn- format-and-print
   "Format output and return exit code."
-  [parsed hostname playbook-name]
-  (let [stats (parser/extract-stats parsed)
-        changed (parser/extract-changed-tasks
-                 parsed hostname)
-        failed (parser/extract-failed-tasks
-                parsed hostname)
-        output (fmt/format-output
-                hostname playbook-name
-                stats changed failed)]
-    (println output)
-    (if (fmt/has-changes? changed failed) 2 0)))
+  [fmt-type parsed hostname playbook-name]
+  (if (= fmt-type "markdown")
+    (format-as-markdown
+     parsed hostname playbook-name)
+    (format-as-json
+     parsed hostname playbook-name)))
 
 (defn- run-format
   "Parse input, format, and return exit code."
@@ -67,6 +100,7 @@
   (let [{:keys [parsed hostname playbook-name]}
         (parse-input options)]
     (format-and-print
+     (:format options "json")
      parsed hostname playbook-name)))
 
 (defn- run
