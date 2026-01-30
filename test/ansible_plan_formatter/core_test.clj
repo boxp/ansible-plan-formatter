@@ -46,3 +46,46 @@
                                :playbook "control-plane"})]
                     (is (= 2 code))))]
       (is (str/includes? output "3 to change")))))
+
+(deftest e2e-stderr-changes-test
+  (testing "stderr shows exit code when changes exist"
+    (let [input (slurp
+                 "resources/test-fixtures/changed.json")
+          err-out (java.io.StringWriter.)]
+      (binding [*err* err-out]
+        (with-out-str
+         (with-in-str input
+                      (#'core/run
+                       {:node "shanghai-1"
+                        :playbook "control-plane"}))))
+      (is (str/includes?
+           (str err-out) "exit 2")))))
+
+(deftest e2e-stderr-no-changes-test
+  (testing "stderr shows exit code for no changes"
+    (let [input (slurp
+                 "resources/test-fixtures/no-changes.json")
+          err-out (java.io.StringWriter.)]
+      (binding [*err* err-out]
+        (with-out-str
+         (with-in-str input
+                      (#'core/run
+                       {:node "shanghai-1"
+                        :playbook "control-plane"}))))
+      (is (str/includes?
+           (str err-out) "exit 0")))))
+
+(deftest e2e-stderr-error-test
+  (testing "stderr shows error for invalid input"
+    (let [err-out (java.io.StringWriter.)
+          code (atom nil)]
+      (binding [*err* err-out]
+        (with-out-str
+         (with-in-str "not json"
+                      (reset! code
+                              (#'core/run
+                               {:node "x"
+                                :playbook "y"})))))
+      (is (= 1 @code))
+      (is (str/includes?
+           (str err-out) "Error:")))))
