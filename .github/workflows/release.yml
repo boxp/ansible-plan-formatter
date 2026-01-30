@@ -33,7 +33,7 @@ jobs:
       - name: Build native image
         run: |
           native-image \
-            -jar target/ansible-plan-formatter-0.1.0-standalone.jar \
+            -jar target/ansible-plan-formatter-1.0.0-standalone.jar \
             -o ansible-plan-formatter \
             -H:+ReportExceptionStackTraces \
             -H:ReflectionConfigurationFiles=reflect-config.json \
