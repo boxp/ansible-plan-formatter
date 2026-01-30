@@ -1,5 +1,6 @@
 (ns ansible-plan-formatter.core-test
     (:require [ansible-plan-formatter.core :as core]
+              [ansible-plan-formatter.parser :as parser]
               [clojure.data.json :as json]
               [clojure.string :as str]
               [clojure.test :refer [deftest is testing]]))
@@ -112,6 +113,18 @@
           parsed (json/read-str output)]
       (is (= 3 (count
                 (get parsed "changed_tasks")))))))
+
+;; --- Stats filtering test ---
+
+(deftest extract-all-filters-stats-test
+  (testing "extract-all filters stats to hostname"
+    (let [input (slurp
+                 "resources/test-fixtures/changed.json")
+          parsed (parser/parse-json input)
+          result (#'core/extract-all
+                  parsed "shanghai-1")]
+      (is (= #{:shanghai-1}
+             (set (keys (:stats result))))))))
 
 ;; --- Stderr tests ---
 

@@ -56,13 +56,15 @@
      :playbook-name (or playbook "playbook")}))
 
 (defn- extract-all
-  "Extract stats, changed and failed tasks."
+  "Extract stats, changed and failed tasks for host."
   [parsed hostname]
-  {:stats (parser/extract-stats parsed)
-   :changed (parser/extract-changed-tasks
-             parsed hostname)
-   :failed (parser/extract-failed-tasks
-            parsed hostname)})
+  (let [all-stats (parser/extract-stats parsed)]
+    {:stats (select-keys
+             all-stats [(keyword hostname)])
+     :changed (parser/extract-changed-tasks
+               parsed hostname)
+     :failed (parser/extract-failed-tasks
+              parsed hostname)}))
 
 (defn- format-as-json
   "Format output as JSON and return exit code."
