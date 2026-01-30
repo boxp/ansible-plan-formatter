@@ -26,7 +26,7 @@ sudo mv ansible-plan-formatter /usr/local/bin/
 
 ```bash
 clojure -T:build uber
-java -jar target/ansible-plan-formatter-0.1.0-standalone.jar --help
+java -jar target/ansible-plan-formatter-1.0.0-standalone.jar --help
 ```
 
 ## 使い方
